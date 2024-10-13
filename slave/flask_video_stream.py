@@ -5,9 +5,9 @@ import threading
 app = Flask(__name__)
 
 # 打开摄像头，设置分辨率和帧率
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(1)
 camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 640)
 camera.set(cv2.CAP_PROP_FPS, 15)
 
 # 全局变量和线程锁
@@ -52,4 +52,4 @@ def video_feed():
 
 if __name__ == "__main__":
     # 启用多线程，并设置 host 为 0.0.0.0
-    app.run(host="127.0.0.1", port=5000, threaded=True)
+    app.run(host="192.168.2.225", port=5000, threaded=True)
