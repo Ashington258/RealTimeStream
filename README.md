@@ -46,15 +46,14 @@ RealTimeStream is a real-time video streaming application that captures video fr
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/RealTimeStream.git
+   git clone https://github.com/Ashington258/RealTimeStream
    cd RealTimeStream
    ```
 
 2. **Set Up a Virtual Environment (Optional but Recommended)**
 
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   conda activate -n realtimestream python=3.10  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install Dependencies**
