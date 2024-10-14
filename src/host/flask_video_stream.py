@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # 打开摄像头，设置分辨率和帧率
 camera = cv2.VideoCapture(1)
-camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
 camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 640)
 camera.set(cv2.CAP_PROP_FPS, 15)
 
