@@ -1,6 +1,8 @@
 
 # RealTimeStream
 
+
+![Project logo](doc/image/realtimestream_logo.webp)
 RealTimeStream is a real-time video streaming application that captures video from a camera, serves it via a Flask server, and allows clients to view the live stream. The project is structured to support both host and slave functionalities, enabling efficient video processing and streaming.
 
 ## Project Structure
