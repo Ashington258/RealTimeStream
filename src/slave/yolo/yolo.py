@@ -6,7 +6,7 @@ import time
 from ultralytics import YOLO
 
 # 加载YOLO模型
-model = YOLO("yolov8s.pt")
+model = YOLO("model/yolov8s.pt")
 
 # 全局变量用于存储当前视频帧
 frame = None
