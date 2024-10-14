@@ -156,3 +156,7 @@ Ensure these models are correctly referenced in your source code for proper func
 
 Contributions are welcome! Please fork the repository and create a pull request with your changes.
 
+## TODO
+- [ ] 修改网络模式，网卡改AP模式，不依赖于路由器
+- [ ] 笔记本端部署工程
+- [ ] 训练集获取
