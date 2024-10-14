@@ -113,6 +113,14 @@ RealTimeStream is a real-time video streaming application that captures video fr
 
    A window titled "Received Video Stream" will appear, displaying the live video. Press `q` to quit.
 
+3. go to the web to see the video stream
+    http://192.168.2.225:5000/video_feed
+
+
+4. run the yolo to see
+
+![yolo test](doc/image/yolo_test.png)
+
 ## Testing
 
 The `test` directory contains scripts to test various camera inputs and media devices.
