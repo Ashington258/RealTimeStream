@@ -1,6 +1,8 @@
 
 # RealTimeStream
 
+
+![Project logo](doc/image/realtimestream_logo.webp)
 RealTimeStream is a real-time video streaming application that captures video from a camera, serves it via a Flask server, and allows clients to view the live stream. The project is structured to support both host and slave functionalities, enabling efficient video processing and streaming.
 
 ## Project Structure
@@ -46,15 +48,14 @@ RealTimeStream is a real-time video streaming application that captures video fr
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/RealTimeStream.git
+   git clone https://github.com/Ashington258/RealTimeStream
    cd RealTimeStream
    ```
 
 2. **Set Up a Virtual Environment (Optional but Recommended)**
 
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   conda activate -n realtimestream python=3.10  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install Dependencies**
@@ -111,6 +112,14 @@ RealTimeStream is a real-time video streaming application that captures video fr
    ```
 
    A window titled "Received Video Stream" will appear, displaying the live video. Press `q` to quit.
+
+3. go to the web to see the video stream
+    http://192.168.2.225:5000/video_feed
+
+
+4. run the yolo to see
+
+![yolo test](doc/image/yolo_test.png)
 
 ## Testing
 
