@@ -1,32 +1,73 @@
-import cv2
+import CV2
 
-# 创建 VideoCapture 对象，CSI 摄像头通常使用索引 0 或 1
-cap = cv2.VideoCapture(0)  # 根据需要调整摄像头索引
 
-# 检查是否成功打开摄像头
-if not cap.isOpened():
-    print("无法打开 CSI 摄像头")
-    exit()
+# 设置gstreamer管道参数
+def gstreamer_pipeline(
+    capture_width=1280,  # 摄像头预捕获的图像宽度
+    capture_height=720,  # 摄像头预捕获的图像高度
+    display_width=1280,  # 窗口显示的图像宽度
+    display_height=720,  # 窗口显示的图像高度
+    framerate=60,  # 捕获帧率
+    flip_method=0,  # 是否旋转图像
+):
+    return (
+        "nvarguscamerasrc ! "
+        "video/x-raw(memory:NVMM), "
+        "width=(int)%d, height=(int)%d, "
+        "format=(string)NV12, framerate=(fraction)%d/1 ! "
+        "nvvidconv flip-method=%d ! "
+        "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
+        "videoconvert ! "
+        "video/x-raw, format=(string)BGR ! appsink"
+        % (
+            capture_width,
+            capture_height,
+            framerate,
+            flip_method,
+            display_width,
+            display_height,
+        )
+    )
 
-# 无限循环读取摄像头帧并显示
-while True:
-    # 从摄像头捕获一帧图像
-    ret, frame = cap.read()
 
-    # 如果读取帧成功，则 ret 为 True
-    if not ret:
-        print("无法获取帧，请检查摄像头是否正常工作")
-        break
+if __name__ == "__main__":
+    capture_width = 1280
+    capture_height = 720
 
-    # 显示帧
-    cv2.imshow("CSI Camera Video Stream", frame)
+    display_width = 1280
+    display_height = 720
 
-    # 按下 'q' 键退出循环
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+    framerate = 60  # 帧数
+    flip_method = 0  # 方向
 
-# 释放摄像头资源
-cap.release()
+    # 创建管道
+    print(
+        gstreamer_pipeline(
+            capture_width,
+            capture_height,
+            display_width,
+            display_height,
+            framerate,
+            flip_method,
+        )
+    )
 
-# 关闭所有 OpenCV 创建的窗口
-cv2.destroyAllWindows()
+    # 管道与视频流绑定
+    cap = CV2.VideoCapture(gstreamer_pipeline(flip_method=0), CV2.CAP_GSTREAMER)
+
+    if cap.isOpened():
+        window_handle = CV2.namedWindow("CSI Camera", CV2.WINDOW_AUTOSIZE)
+
+        # 逐帧显示
+        while CV2.getWindowProperty("CSI Camera", 0) >= 0:
+            ret_val, img = cap.read()
+            CV2.imshow("CSI Camera", img)
+
+            keyCode = CV2.waitKey(30) & 0xFF
+            if keyCode == 27:  # ESC键退出
+                break
+
+        cap.release()
+        CV2.destroyAllWindows()
+    else:
+        print("打开摄像头失败")

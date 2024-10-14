@@ -1,4 +1,5 @@
 import cv2
+import subprocess
 
 # 创建 VideoCapture 对象，参数 0 通常是默认摄像头，1 是 USB 摄像头
 cap = cv2.VideoCapture(1)  # 根据需要调整摄像头索引
@@ -8,9 +9,19 @@ if not cap.isOpened():
     print("无法打开摄像头")
     exit()
 
-# 获取摄像头名称（可能在某些系统上不支持）
-camera_name = cap.get(cv2.CAP_PROP_FOURCC)
-camera_name = "摄像头名称: " + str(camera_name)
+# 获取摄像头的设备路径
+device_index = 1  # 根据需要调整
+device_path = f"/dev/video{device_index}"
+
+# 使用 v4l2-ctl 获取摄像头名称和其他信息
+try:
+    output = subprocess.check_output(
+        ["v4l2-ctl", "--device=" + device_path, "--all"], universal_newlines=True
+    )
+    print("摄像头信息:")
+    print(output)
+except subprocess.CalledProcessError as e:
+    print(f"获取摄像头信息失败: {e}")
 
 # 获取分辨率
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -21,8 +32,7 @@ resolution = f"分辨率: {width}x{height}"
 fps = cap.get(cv2.CAP_PROP_FPS)
 fps_info = f"帧率: {fps} FPS"
 
-# 打印摄像头信息
-print(camera_name)
+# 打印摄像头分辨率和帧率
 print(resolution)
 print(fps_info)
 
