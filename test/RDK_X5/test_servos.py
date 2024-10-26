@@ -4,80 +4,62 @@ import signal
 import Hobot.GPIO as GPIO
 import time
 
-class Servo:
-    def __init__(self, pin, frequency=50, min_pulse=500, max_pulse=2500):
-        """
-        初始化舵机控制接口。
-        :param pin: PWM控制的GPIO引脚
-        :param frequency: PWM频率（默认为50Hz）
-        :param min_pulse: 最小脉宽（单位为us，默认为500us）
-        :param max_pulse: 最大脉宽（单位为us，默认为2500us）
-        """
-        self.pin = pin
-        self.frequency = frequency
-        self.min_pulse = min_pulse
-        self.max_pulse = max_pulse
-        self.pwm = None
-        
-        GPIO.setwarnings(False)
-        GPIO.setmode(GPIO.BOARD)
-        
-        self.pwm = GPIO.PWM(self.pin, self.frequency)
-        self.pwm.start(0)
-
-    def set_pulse(self, pulse):
-        """
-        设置舵机的脉宽。
-        :param pulse: 目标脉宽（单位为us）
-        """
-        if pulse < self.min_pulse or pulse > self.max_pulse:
-            raise ValueError("Pulse width out of range")
-        duty_cycle = (pulse / 20000.0) * 100  # 计算占空比，周期为20ms
-        self.pwm.ChangeDutyCycle(duty_cycle)
-
-    def cleanup(self):
-        """
-        停止PWM并清理GPIO。
-        """
-        if self.pwm:
-            self.pwm.stop()
-        GPIO.cleanup()
-
-# 例子代码，用于演示Servo类的使用
 def signal_handler(signal, frame):
     sys.exit(0)
 
+# 支持PWM的管脚: 32 和 33，使用PWM时确保该管脚未被其他功能占用
+output_pin = 32
+GPIO.setwarnings(False)
+
+def set_servo_pwm(pwm, frequency, pulse_width_us):
+    """
+    设置舵机的PWM信号，脉宽为 500us 到 2500us。
+    
+    参数:
+    - pwm: GPIO.PWM 实例
+    - frequency: PWM频率，单位为 Hz，通常为 50Hz
+    - pulse_width_us: 脉宽，单位为微秒，范围通常是 500~2500 微秒
+    """
+    pwm.ChangeFrequency(frequency)
+    
+    # 计算占空比：duty_cycle = (pulse_width_us / period_us) * 100
+    period_us = 1_000_000 / frequency  # 50Hz时，周期为 20,000us
+    duty_cycle = (pulse_width_us / period_us) * 100
+    
+    # 确保 duty_cycle 在 0 到 100 之间
+    duty_cycle = max(0, min(duty_cycle, 100))
+    
+    pwm.ChangeDutyCycle(duty_cycle)
+
 def main():
-    signal.signal(signal.SIGINT, signal_handler)
+    GPIO.setmode(GPIO.BOARD)
+    
+    # 初始化 PWM
+    frequency = 100  # 舵机的标准频率为 50Hz
+    pulse_width_us = 1500  # 初始脉宽为 1500 微秒 (舵机中位)
+    p = GPIO.PWM(output_pin, frequency)
+    
+    # 设置初始脉宽和频率
+    set_servo_pwm(p, frequency, pulse_width_us)
+    p.start(0)  # 开始时占空比为0，后续将通过 `set_servo_pwm` 调整
 
-    # 创建一个Servo对象，连接到引脚33
-    servo = Servo(pin=33)
-
+    print("Servo PWM running. Press CTRL+C to exit.")
     try:
-        print("Moving servo to min position (500us)")
-        servo.set_pulse(500)
-        time.sleep(1)
-        
-        print("Moving servo to mid position (1500us)")
-        servo.set_pulse(1500)
-        time.sleep(1)
-
-        print("Moving servo to max position (2500us)")
-        servo.set_pulse(2500)
-        time.sleep(1)
-
-        # 持续循环模拟舵机逐步移动
-        pulse = 500
-        incr = 50
         while True:
-            servo.set_pulse(pulse)
-            time.sleep(0.1)
-            pulse += incr
-            if pulse >= 2500 or pulse <= 500:
-                incr = -incr
-
+            # 动态调整脉宽（模拟舵机转动）
+            time.sleep(0.5)
+            
+            # 调整脉宽
+            pulse_width_us += 100  # 每次增加 100 微秒
+            if pulse_width_us > 2500:  # 限制脉宽范围为 500 到 2500 微秒
+                pulse_width_us = 500
+            
+            # 调用函数设置新的脉宽
+            set_servo_pwm(p, frequency, pulse_width_us)
     finally:
-        servo.cleanup()
+        p.stop()
+        GPIO.cleanup()
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, signal_handler)
     main()

@@ -9,7 +9,7 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 # 支持PWM的管脚: 32 and 33, 在使用PWM时，必须确保该管脚没有被其他功能占用
-output_pin = 33
+output_pin = 32
 
 GPIO.setwarnings(False)
 
