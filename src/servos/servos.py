@@ -14,7 +14,9 @@ def ServosInit(output_pin, frequency=50, initial_pulse_width_us=1500):
     set_servo_pwm(pwm, frequency, initial_pulse_width_us)
     pwm.start(0)
     # 立即设置一个初始脉宽，确保进入有效信号状态
-    set_servo_pwm(pwm, frequency, initial_pulse_width_us)
+    # BUG
+    # 为了保证机械结构在结束进程的时候可以回到正确位置，暂时注释(否则被cleanup后会直接设置成0度导致舵机堵转)
+    # set_servo_pwm(pwm, frequency, initial_pulse_width_us)
     return pwm
 
 def set_servo_pwm(pwm, frequency, pulse_width_us):
