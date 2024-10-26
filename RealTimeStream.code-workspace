@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../control_unit"
+		}
+	],
+	"settings": {}
+}
