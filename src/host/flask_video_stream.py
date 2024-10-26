@@ -2,6 +2,7 @@ from flask import Flask, Response
 import cv2
 import threading
 import json
+from servos.servos import ServosInit, set_servo_pwm, cleanup  # 导入舵机控制模块
 
 
 class VideoStream:
@@ -39,7 +40,7 @@ class VideoStream:
             )
 
 
-def create_app(camera_config):
+def create_app(camera_config, pwm):
     app = Flask(__name__)
     video_stream = VideoStream(
         camera_index=camera_config["index"],
@@ -55,6 +56,13 @@ def create_app(camera_config):
             mimetype="multipart/x-mixed-replace; boundary=frame",
         )
 
+    # 其他路由可以加入舵机控制逻辑
+    @app.route("/servo_control/<int:pulse_width>")
+    def servo_control(pulse_width):
+        # 设置舵机脉宽
+        set_servo_pwm(pwm, 50, pulse_width)
+        return {"status": "success", "pulse_width": pulse_width}
+
     return app
 
 
@@ -65,5 +73,17 @@ def load_config(file_path="src/config.json"):
 
 if __name__ == "__main__":
     config = load_config()
-    app = create_app(config["camera"])
-    app.run(host=config["host"], port=config["port"], threaded=True)
+
+    # 初始化舵机
+    output_pin = 32  # PWM 输出的 GPIO 管脚
+    pwm = ServosInit(output_pin, frequency=50, initial_pulse_width_us=1500)
+
+    try:
+        # 启动 Flask 应用
+        app = create_app(config["camera"], pwm)
+        app.run(host=config["host"], port=config["port"], threaded=True)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # 清理舵机和 GPIO 资源
+        cleanup(pwm)
