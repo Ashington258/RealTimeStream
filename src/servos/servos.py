@@ -11,6 +11,7 @@ def ServosInit(output_pin, frequency=50, initial_pulse_width_us=1500):
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BOARD)
     pwm = GPIO.PWM(output_pin, frequency)
+    set_servo_pwm(pwm, frequency, initial_pulse_width_us)
     pwm.start(0)
     # 立即设置一个初始脉宽，确保进入有效信号状态
     set_servo_pwm(pwm, frequency, initial_pulse_width_us)
