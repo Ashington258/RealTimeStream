@@ -10,51 +10,54 @@ def signal_handler(signal, frame):
 # 支持PWM的管脚: 32 和 33，使用PWM时确保该管脚未被其他功能占用
 output_pin = 32
 GPIO.setwarnings(False)
-
-def set_servo_pwm(pwm, frequency, pulse_width_us):
+def Servos_Init(output_pin, frequency, pulse_width_us):
     """
-    设置舵机的PWM信号，脉宽为 500us 到 2500us。
+    初始化舵机的PWM设置。
     
     参数:
-    - pwm: GPIO.PWM 实例
-    - frequency: PWM频率，单位为 Hz，通常为 50Hz
-    - pulse_width_us: 脉宽，单位为微秒，范围通常是 500~2500 微秒
+    - output_pin: PWM输出引脚编号。
+    - frequency: PWM信号的频率。
+    - pulse_width_us: 脉冲宽度，单位为微秒。
+    
+    返回:
+    - p: PWM控制对象。
     """
-    pwm.ChangeFrequency(frequency)
+    p = GPIO.PWM(output_pin, frequency)  # 创建PWM对象并设置频率
+    p.start(0)  # 开始时占空比为0
+    set_servo_pwm(p, frequency, pulse_width_us)  # 设置舵机的PWM参数
+    return p
+
+def set_servo_pwm(pwm, frequency, pulse_width_us):
+    """设置舵机的PWM信号，脉宽为500us到2500us。
     
-    # 计算占空比：duty_cycle = (pulse_width_us / period_us) * 100
-    period_us = 1_000_000 / frequency  # 50Hz时，周期为 20,000us
-    duty_cycle = (pulse_width_us / period_us) * 100
-    
-    # 确保 duty_cycle 在 0 到 100 之间
-    duty_cycle = max(0, min(duty_cycle, 100))
-    
-    pwm.ChangeDutyCycle(duty_cycle)
+    参数:
+    pwm: PWM对象，用于控制舵机。
+    frequency: PWM信号的频率。
+    pulse_width_us: PWM信号的脉宽，单位为微秒。
+    """
+    pwm.ChangeFrequency(frequency)  # 设置PWM信号的频率
+    period_us = 1_000_000 / frequency  # 计算PWM信号的周期，单位为微秒
+    duty_cycle = (pulse_width_us / period_us) * 100  # 计算占空比
+    duty_cycle = max(0, min(duty_cycle, 100))  # 确保占空比在0到100之间
+    pwm.ChangeDutyCycle(duty_cycle)  # 设置PWM信号的占空比
+
 
 def main():
     GPIO.setmode(GPIO.BOARD)
     
-    # 初始化 PWM
-    frequency = 100  # 舵机的标准频率为 50Hz
-    pulse_width_us = 1500  # 初始脉宽为 1500 微秒 (舵机中位)
-    p = GPIO.PWM(output_pin, frequency)
-    
-    # 设置初始脉宽和频率
-    set_servo_pwm(p, frequency, pulse_width_us)
-    p.start(0)  # 开始时占空比为0，后续将通过 `set_servo_pwm` 调整
+    frequency = 50  # 舵机的标准频率
+    pulse_width_us = 1500  # 初始脉宽
+
+    # 初始化舵机
+    p = Servos_Init(output_pin, frequency, pulse_width_us)
 
     print("Servo PWM running. Press CTRL+C to exit.")
     try:
-        while True:
-            # 动态调整脉宽（模拟舵机转动）
-            time.sleep(0.5)
-            
-            # 调整脉宽
-            pulse_width_us += 100  # 每次增加 100 微秒
-            if pulse_width_us > 2500:  # 限制脉宽范围为 500 到 2500 微秒
+        while True: 
+            time.sleep(0.01)
+            pulse_width_us += 10  # 每次增加10微秒
+            if pulse_width_us > 2500:  # 限制脉宽范围为500到2500微秒
                 pulse_width_us = 500
-            
-            # 调用函数设置新的脉宽
             set_servo_pwm(p, frequency, pulse_width_us)
     finally:
         p.stop()
