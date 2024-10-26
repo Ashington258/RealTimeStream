@@ -2,7 +2,7 @@ import cv2
 import subprocess
 
 # 创建 VideoCapture 对象，参数 0 通常是默认摄像头，1 是 USB 摄像头
-cap = cv2.VideoCapture(1)  # 根据需要调整摄像头索引
+cap = cv2.VideoCapture(0)  # 根据需要调整摄像头索引
 
 # 检查是否成功打开摄像头
 if not cap.isOpened():
