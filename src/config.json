@@ -3,8 +3,9 @@
     "port": 5000,
     "camera": {
         "index": 0,
-        "width": 480,
-        "height": 640,
-        "fps": 15
+        "width": 640,
+        "height": 480,
+        "fps": 30,
+        "fourcc": "MJPG"
     }
 }
