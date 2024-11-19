@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream</title>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>Live Video Stream</h1>
+    <img id="video-frame" alt="Live Video Stream" style="width: 640px; height: 480px;" />
+    <script>
+        const socket = io();
+
+        // Start the video stream
+        socket.emit("start_stream");
+
+        // Listen for video frames
+        socket.on("video_frame", (data) => {
+            const img = document.getElementById("video-frame");
+            img.src = "data:image/jpeg;base64," + data.frame;
+        });
+
+        // Stop the video stream on unload
+        window.onbeforeunload = () => {
+            socket.emit("stop_stream");
+        };
+    </script>
+</body>
+
+</html>
